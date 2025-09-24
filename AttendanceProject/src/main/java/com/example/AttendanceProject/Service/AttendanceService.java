@@ -30,10 +30,13 @@ public class AttendanceService {
         Attendance attendance=new Attendance();
         attendance.setStudent(student);
         attendance.setDate(date);
-        attendance.setStatus(status);
+        attendance.setStatus(status.trim());
         Attendance save=attendanceRepo.save(attendance);
-        if("ABSENT".equalsIgnoreCase(status)){
+        if("ABSENT".equalsIgnoreCase(status.trim())){
+            System.out.println("Mail send");
             mailToParent(student,date);
+        }else{
+            System.out.println("not");
         }
         return save;
     }
@@ -41,15 +44,21 @@ public class AttendanceService {
     private void mailToParent(Student student, LocalDate date){
         if(student.getEmail()==null || student.getEmail().isBlank()){
             System.out.println("not found email");
+
             return;
         }
-        SimpleMailMessage mailMessage=new SimpleMailMessage();
-        mailMessage.setTo(student.getEmail());
-        mailMessage.setSubject("Attendance Report");
-        mailMessage.setText("Your child with Roll number"+student.getRollnumber()+"name"+student.getName()
-        +"is absent on "+date+"'");
-        javaMailSender.send(mailMessage);
-
+        try {
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(student.getEmail().trim());
+            mailMessage.setSubject("Attendance Report");
+            mailMessage.setText("Your child with Roll number" + student.getRollnumber() + "name" + student.getName()
+                    + "is absent on " + date + "'");
+            javaMailSender.send(mailMessage);
+            System.out.println("Mail sent successfully to: " + student.getEmail());
+        }catch (Exception e) {
+            System.err.println("Failed to send mail: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public List<Attendance> getAbsentStudent(LocalDate date){
