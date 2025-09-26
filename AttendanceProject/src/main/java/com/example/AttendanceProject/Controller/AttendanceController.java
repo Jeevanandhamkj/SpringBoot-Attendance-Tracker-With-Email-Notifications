@@ -36,7 +36,7 @@ public class AttendanceController {
         LocalDate date1=LocalDate.parse(date);
         return ResponseEntity.ok(attendanceService.getAbsentStudent(date1));
     }
-    @GetMapping("/att/dash")
+    @GetMapping("/Att/dash")
 public Map<String,Object>dash(@RequestParam (required = false) String date){
         Map<String,Object>map=new HashMap<>();
         int totalStudentCount=studentService.getAll().size();

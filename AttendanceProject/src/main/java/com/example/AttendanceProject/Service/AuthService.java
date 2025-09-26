@@ -30,7 +30,7 @@ public class AuthService {
         if(op.isPresent()){
             User user=op.get();
             if(encoder.matches(password,user.getPassword())){
-              return   jwtUtils.generateToken(user.getUsername());
+              return   jwtUtils.generateToken(user.getUsername(),user.getRole());
             }else{
                 throw new RuntimeException("no");
             }

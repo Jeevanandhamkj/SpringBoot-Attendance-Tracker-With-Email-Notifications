@@ -18,17 +18,34 @@ public class JwtUtils {
     private final Key SecretKeys= Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
 
-    public String generateToken(String username){
-        return Jwts.builder().setSubject(username)
+    public String generateToken(String username,String role){
+        return Jwts.builder().setSubject(username).claim("Role",role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+1000*60*60))
                 .signWith(SecretKeys, SignatureAlgorithm.HS256).compact();
+    }
+
+    public String generateRole(String token){
+        return Jwts.parserBuilder().setSigningKey(SecretKeys)
+                .build().parseClaimsJws(token).getBody().get("Role",String.class);
     }
 
     public boolean validateToken(String token){
         try {
             Jwts.parserBuilder().setSigningKey(SecretKeys)
                     .build().parseClaimsJws(token).getBody().getSubject();
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+    public String extractUsername(String token){
+        return Jwts.parserBuilder().setSigningKey(SecretKeys).build().parseClaimsJws(token)
+                .getBody().getSubject();
+    }
+    public Boolean validateJwt(String token){
+        try{
+            extractUsername(token);
             return true;
         }catch (Exception e){
             return false;
